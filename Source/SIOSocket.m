@@ -131,7 +131,17 @@
 // Event listeners
 - (void)on:(NSString *)event do:(void (^)(id))function
 {
-    self.javascriptContext[[NSString stringWithFormat: @"objc_%@", event]] = function;
+    [self on: event perform: function];
+}
+
+- (void)on:(NSString *)event perform:(void (^)(id))function
+{
+    self.javascriptContext[[NSString stringWithFormat: @"objc_%@", event]] = ^(id data)
+    {
+        if (function)
+            function(data);
+    };
+    
     [self.javascriptContext evaluateScript: [NSString stringWithFormat: @"objc_socket.on('%@', objc_%@);", event, event]];
 }
 
@@ -155,12 +165,14 @@
 - (void)emit:(NSString *)event arguments:(NSArray *)arguments
 {
     NSMutableArray *argumentStrings = [NSMutableArray array];
+    [argumentStrings addObject: [NSString stringWithFormat: @"'%@'", event]];
+    
     for (id argument in arguments)
     {
         [argumentStrings addObject: [NSString stringWithFormat: @"'%@'", argument]];
     }
     
-    [self.javascriptContext evaluateScript: [NSString stringWithFormat: @"objc_socket.emit(%@);", [arguments componentsJoinedByString: @", "]]];
+    [self.javascriptContext evaluateScript: [NSString stringWithFormat: @"objc_socket.emit(%@);", [argumentStrings componentsJoinedByString: @", "]]];
 }
 
 @end
