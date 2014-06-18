@@ -20,7 +20,9 @@
     XCTestExpectation *connectionExpectation = [self expectationWithDescription: @"should connect to localhost"];
     [SIOSocket socketWithHost: @"http://localhost:3000" response: ^(SIOSocket *socket)
     {
-        XCTAssertNotNil(socket, @"socket could not connect to localhost");
+        XCTAssertNotNil(socket, @"socket could not find localhost");
+        XCTAssert(socket.isConnected, @"socket could not connect to localhost");
+        
         [connectionExpectation fulfill];
     }];
 

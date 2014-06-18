@@ -16,6 +16,8 @@
 @property UIWebView *javascriptWebView;
 @property (readonly) JSContext *javascriptContext;
 
+@property (nonatomic, readwrite) BOOL isConnected;
+
 @end
 
 @implementation SIOSocket
@@ -68,12 +70,14 @@
         // Responders
         socket.javascriptContext[@"objc_onConnect"] = ^()
         {
+            socket.isConnected = YES;
             if (socket.onConnect)
                 socket.onConnect();
         };
 
         socket.javascriptContext[@"objc_onDisconnect"] = ^()
         {
+            socket.isConnected = NO;
             if (socket.onDisconnect)
                 socket.onDisconnect();
         };
@@ -86,6 +90,7 @@
 
         socket.javascriptContext[@"objc_onReconnect"] = ^(NSInteger numberOfAttempts)
         {
+            socket.isConnected = YES;
             if (socket.onReconnect)
                 socket.onReconnect(numberOfAttempts);
         };
@@ -138,11 +143,21 @@
 
     for (id argument = event; argument != nil; argument = va_arg(args, id))
     {
-        [arguments addObject: [NSString stringWithFormat: @"'%@'", argument]];
+        [arguments addObject: argument];
     }
 
     va_end(args);
+    [self emit: event arguments: arguments];
+}
 
+- (void)emit:(NSString *)event arguments:(NSArray *)arguments
+{
+    NSMutableArray *argumentStrings = [NSMutableArray array];
+    for (id argument in arguments)
+    {
+        [argumentStrings addObject: [NSString stringWithFormat: @"'%@'", argument]];
+    }
+    
     [self.javascriptContext evaluateScript: [NSString stringWithFormat: @"objc_socket.emit(%@);", [arguments componentsJoinedByString: @", "]]];
 }
 

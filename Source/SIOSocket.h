@@ -14,6 +14,9 @@
 + (void)socketWithHost:(NSString *)hostURL response:(void(^)(SIOSocket *socket))response;
 + (void)socketWithHost:(NSString *)hostURL reconnectAutomatically:(BOOL)reconnectAutomatically attemptLimit:(NSInteger)attempts withDelay:(NSTimeInterval)reconnectionDelay maximumDelay:(NSTimeInterval)maximumDelay timeout:(NSTimeInterval)timeout response:(void(^)(SIOSocket *socket))response;
 
+// State
+@property (nonatomic, readonly) BOOL isConnected;
+
 // Event responders
 @property (nonatomic, copy) void (^onConnect)();
 @property (nonatomic, copy) void (^onDisconnect)();
@@ -27,5 +30,6 @@
 
 // Emitters
 - (void)emit:(NSString *)event, ... NS_REQUIRES_NIL_TERMINATION;
+- (void)emit:(NSString *)event arguments:(NSArray *)arguments;
 
 @end
