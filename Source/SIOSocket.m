@@ -68,43 +68,45 @@
         }
 
         // Responders
+        __weak typeof(socket) weakSocket = socket;
+        
         socket.javascriptContext[@"objc_onConnect"] = ^()
         {
-            socket.isConnected = YES;
-            if (socket.onConnect)
-                socket.onConnect();
+            weakSocket.isConnected = YES;
+            if (weakSocket.onConnect)
+                weakSocket.onConnect();
         };
 
         socket.javascriptContext[@"objc_onDisconnect"] = ^()
         {
-            socket.isConnected = NO;
-            if (socket.onDisconnect)
-                socket.onDisconnect();
+            weakSocket.isConnected = NO;
+            if (weakSocket.onDisconnect)
+                weakSocket.onDisconnect();
         };
 
         socket.javascriptContext[@"objc_onError"] = ^(NSDictionary *errorDictionary)
         {
-            if (socket.onError)
-                socket.onError(errorDictionary);
+            if (weakSocket.onError)
+                weakSocket.onError(errorDictionary);
         };
 
         socket.javascriptContext[@"objc_onReconnect"] = ^(NSInteger numberOfAttempts)
         {
-            socket.isConnected = YES;
-            if (socket.onReconnect)
-                socket.onReconnect(numberOfAttempts);
+            weakSocket.isConnected = YES;
+            if (weakSocket.onReconnect)
+                weakSocket.onReconnect(numberOfAttempts);
         };
 
         socket.javascriptContext[@"objc_onReconnectionAttempt"] = ^(NSInteger numberOfAttempts)
         {
-            if (socket.onReconnectionAttempt)
-                socket.onReconnectionAttempt(numberOfAttempts);
+            if (weakSocket.onReconnectionAttempt)
+                weakSocket.onReconnectionAttempt(numberOfAttempts);
         };
 
         socket.javascriptContext[@"objc_onReconnectionError"] = ^(NSDictionary *errorDictionary)
         {
-            if (socket.onReconnectionError)
-                socket.onReconnectionError(errorDictionary);
+            if (weakSocket.onReconnectionError)
+                weakSocket.onReconnectionError(errorDictionary);
         };
 
         [socket.javascriptContext evaluateScript: @"objc_socket.on('connect', objc_onConnect);"];
