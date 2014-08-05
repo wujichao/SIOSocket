@@ -151,4 +151,10 @@
     [self.javascriptContext evaluateScript: [NSString stringWithFormat: @"objc_socket.emit(%@);", [arguments componentsJoinedByString: @", "]]];
 }
 
+- (void)emit:(NSString *)event data:(NSString *)data callback:(void (^)(id))callback
+{
+    self.javascriptContext[[NSString stringWithFormat: @"objc_callback_%@", event]] = callback;
+    [self.javascriptContext evaluateScript: [NSString stringWithFormat: @"objc_socket.emit('%@', '%@', objc_callback_%@);", event, data, event]];
+}
+
 @end

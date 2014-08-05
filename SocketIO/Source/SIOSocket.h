@@ -27,5 +27,5 @@
 
 // Emitters
 - (void)emit:(NSString *)event, ... NS_REQUIRES_NIL_TERMINATION;
-
+- (void)emit:(NSString *)event data:(NSString *)data callback:(void (^)(id))callback;
 @end
